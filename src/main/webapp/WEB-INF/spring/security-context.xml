@@ -5,17 +5,19 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	
-	<!-- 403 금지를 처리하는 구현 객체를 빈으로 등록 -->
+	<!-- 403 금지를 처리하는 구현 객체를 빈으로 등록 
 	<bean id="customAccessDenied" class="org.zerock.security.CustomAccessDeniedHandler"></bean>
-	
 	<bean id="customLoginSuccess" class="org.zerock.security.CustomLoginSuccessHandler"></bean>
+	-->
+	
 	<!-- 로그인 시 비밀번호를 암호화해서 처리해야 하는데, 암호화를 적용하지 않은 인코더를 적용 -->
 	<!-- 
 	<bean id="customPasswordEncoder" class="org.zerock.security.CustomNoOpPasswordEncoder"></bean>
 	 -->
-	 <!-- 암호화를 적용하는 인코더 -->
+	 <!-- 암호화를 적용하는 인코더 
 	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
 	<bean id="customUserDetailsService" class="org.zerock.security.CustomUserDetailsService"></bean>
+	 -->
 		
 	<security:http auto-config="true" use-expressions="true">
 		<!-- 서비스 기능 중에 접근할 수 있는 기능에 대한 설정 : 권한에 따른 사용 가능 여부 -->
