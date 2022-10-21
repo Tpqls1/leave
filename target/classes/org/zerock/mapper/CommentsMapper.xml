@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http::/mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.CommentsMapper">
+	<resultMap type="org.zerock.mapper.CommentsMapper" id="commentsMap">
+		<id property="cno" column="cno"></id>
+		<result property="bno" column="bno"></result>
+		<result property="commenter" column="commenter"></result>
+		<result property="comment" column="comment"></result>
+		<result property="parent" column="parent"></result>
+		<result property="comDate" column="comDate"></result>
+	</resultMap>
+<insert id="insert">
+<choose>
+<when test="">
+
+</when>
+<
+</choose>
+
+<if test="parent != null">
+insert into comments (bno, comment, commenter, parent)
+	values (#{bno}, #{comment}, #{commenter}, #{parent})
+</if>
+<else>
+insert into comments (bno, comment, commenter)
+	values (#{bno}, #{comment}, #{commenter})
+</else>
+</insert>
+
+<select id="read" resultType="org.zerock.domain.CommentsVO">
+select * from comments where cno = #{cno}
+</select>
+
+<delete id="delete">
+delete from comments where cno = #{cno}
+</delete>
+
+<update id="update">
+update comments set comments = #{comments} where cno = #{cno}
+</update>
+
+<select id="getListWithPaging" resultType="org.zerock.domain.commentsVO">
+select * from comments where bno = #{bno} order by cno asc limit #{cri.pageStart}, #{cri.amount}
+</select>
+
+<select id="getCountByBno" resultType="int">
+select count(cno) from comments where bno = #{bno}
+</select>
+
+</mapper>
