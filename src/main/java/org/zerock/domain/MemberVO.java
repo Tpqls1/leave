@@ -18,6 +18,5 @@ public class MemberVO {
 	private String birth_date;	
 	private String gender;
 	private Date regDate;		//	회원가입일 <- 정렬기준
-	private Integer grade; 
 	private boolean enabled;
 }

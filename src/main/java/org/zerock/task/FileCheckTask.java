@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.zerock.domain.BoardAttachVO;
-import org.zerock.mapper.BoardAttachMapper;
+import org.zerock.domain.AttachVO;
+import org.zerock.mapper.AttachMapper;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
@@ -23,7 +23,7 @@ import lombok.extern.log4j.Log4j;
 public class FileCheckTask {
 	private static final String UPLOAD_PATH = "/Users/tpqls/upload";
 	@Setter(onMethod_ = @Autowired)
-	private BoardAttachMapper attachMapper;
+	private AttachMapper attachMapper;
 	// @Scheduled : 주기적인 작업을 수행
 	// 0 : 초
 	// * : 분
@@ -44,12 +44,12 @@ public class FileCheckTask {
 	//	전날에 있는 데이터에 대하여 작업한다.
 	//	데이터베이스에 존재하지 않지만 파일로 존재하는 파일을 삭제 : 기준 -> 데이터베이스 
 	//	데이터베이스에 존재하는 파일은 유지를 하고 존재하지 않으면 삭제 
-	@Scheduled(cron = "0 50 11 * * *") // 오전 11시 50분 
+	@Scheduled(cron = "0 45 14 * * *") // 오전 11시 50분 
 	public void checkFiles() {
 		log.warn("File check task run.........");
 		log.warn(new Date());
 		// file list in datebase
-		List<BoardAttachVO> fileList = attachMapper.getOldFiles(); // 데이터베이스 테이블
+		List<AttachVO> fileList = attachMapper.getOldFiles(); // 데이터베이스 테이블
 
 		// ready for check file in directory with database file list
 		List<Path> fileListPaths = fileList.stream()
@@ -57,7 +57,7 @@ public class FileCheckTask {
 				.collect(Collectors.toList()); // 파일에 대한 목록(존재하는) - 원본파일
 
 		// image file has thumbnail file
-		fileList.stream().filter(vo -> vo.isFileType() == true).map(
+		fileList.stream().filter(vo -> vo.isAttachType() == true).map(
 				vo -> Paths.get(UPLOAD_PATH, vo.getUploadPath(), "s_" + vo.getUuid() + "_" + vo.getFileName())) // 섬네일
 				.forEach(p -> fileListPaths.add(p));
 		log.warn("=======================================");

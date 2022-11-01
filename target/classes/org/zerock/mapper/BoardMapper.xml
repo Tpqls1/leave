@@ -8,9 +8,6 @@
 	  <foreach item='type' collection="typeArr">
 	  	<trim prefix="OR">
 	  	  <choose>
-	  	    <when test="type == 'H'.toString()">
-	  	      writer like CONCAT('%', #{keyword}, '%') 
-	  	    </when>
 	  	    <when test="type == 'T'.toString()">
 	  	      title like CONCAT('%', #{keyword}, '%')
 	  	    </when>
@@ -24,14 +21,42 @@
 	  	</trim>
 	  </foreach>
 	</trim>
+	<!-- 
+	TODO : 메인페이지게시글,게시글기능(CRUD),페이징처리,댓글기능(CRUD),검색기능
+	좋아요,조회수
+	
+	카테고리 번호로 검색 	
+	select * from board where bno in(select bno from board_cat where catno = ${catno}) 
+	select board.* from board join board_cat on board.bno = board_cat.bno where board_cat.catno = #{catno}
+	태그 번호로 검색
+	select board.* from board join board_tag on board.bno = board_tag.bno where board_tag.tagno = #{tagno}
+	 -->
 </sql>
-
+	<resultMap type="org.zerock.domain.BoardVO" id="boardMap">
+		<id property="bno" column="bno"></id>
+		<result property="title" column="title"></result>
+		<result property="content" column="content"></result>
+		<result property="userid" column="userid"></result>
+		<result property="likeCnt" column="likeCnt"></result>
+		<result property="regDate" column="regdate"></result>
+		<result property="comCnt" column="comCnt"></result>
+		<collection property="catList" resultMap="BoardCatMap"></collection>
+	</resultMap>
+	
+	<resultMap type="org.zerock.domain.BoardCatVO" id="BoardCatMap">
+		<result property="bcno" column="bcno"></result>
+		<result property="bno" column="bno"></result>
+		<result property="catno" column="catno"></result>
+	</resultMap>
+	
+<!-- 전체 게시글 조회 -->
 <select id="getList" resultType="org.zerock.domain.BoardVO">
 <![CDATA[
 select * from board where bno > 0 order by bno desc
 ]]>
 </select>
 
+<!-- 전체 게시글(페이징) -->
 <select id="getListWithPaging" resultType="org.zerock.domain.BoardVO">
 <![CDATA[
 select * from board where bno > 0
@@ -40,15 +65,23 @@ select * from board where bno > 0
 order by bno desc limit #{pageStart}, #{amount}
 </select>
 
+<select id="getMaxBno" resultType="Integer">
+select max(bno) from board
+</select>
+
 <!-- 카테고리별 검색 -->
-<select id="getListWithPagingByCatno" resultType="org.zerock.domain.BoardVO">
+<select id="getListWithPagingByCatNo" resultType="org.zerock.domain.BoardVO">
 <![CDATA[
-select * from board where bno > 0 and catno = #{catno}
+select board.* from board join board_cat on board.bno = board_cat.bno
+where board.bno > 0 and board_cat.catno = #{catno}
 ]]>
 <include refid="criteria"></include>
 order by bno desc limit #{pageStart}, #{amount}
 </select>
-
+<select id="readByUserid">
+	select * from board where userid=${}
+</select>
+<!-- 게시글 수 -->
 <select id="getTotalCount" resultType="int">
 <![CDATA[
 select count(*) from board where bno > 0
@@ -56,9 +89,18 @@ select count(*) from board where bno > 0
 <include refid="criteria"></include>
 </select>
 
-<select id="getTotalCountByCatno" resultType="int">
+<!-- 게시글 수(카테고리별) -->
+<select id="getTotalCountByCatNo" resultType="int">
 <![CDATA[
 select count(*) from board where bno > 0 and catno = #{catno}
+]]>
+<include refid="criteria"></include>
+</select>
+
+<!-- 게시글 수(해시태그) -->
+<select id="getTotalCountByTagNo" resultType="int">
+<![CDATA[
+select count(*) from board where bno > 0 and tagno = #{tagno}
 ]]>
 <include refid="criteria"></include>
 </select>
@@ -76,20 +118,28 @@ select last_insert_id() as bno
 </selectKey>
 </insert>
 
+<!-- 게시글 상세 -->
 <select id="read" resultType="org.zerock.domain.BoardVO">
 select * from board where bno = #{bno}
 </select>
-
+<!-- 수정 -->
 <update id="update">
 	update board set title=#{title}, content=#{content} where bno = #{bno}
 </update>
-
+<!-- 삭제 -->
 <delete id="delete">
 delete from board where bno = #{bno}
 </delete>
-
+<!-- 댓글 수 업데이트 -->
 <update id="updateReplyCnt">
 update board set comCnt = comCnt + #{amount} where bno = #{bno}
 </update>
-
+<!-- 좋아요 수 증가 -->
+<update id="increaseLikeCnt">
+update board set likeCnt = likeCnt + 1
+</update>
+<!-- 좋아요 수 감소 -->
+<update id="decreaseLikeCnt">
+update board set likeCnt = likeCnt - 1
+</update>
 </mapper>

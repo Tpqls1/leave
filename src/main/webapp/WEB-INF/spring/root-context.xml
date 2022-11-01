@@ -17,7 +17,7 @@
 	<!-- Hikari CP 설정 -->
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
-		<property name="jdbcUrl" value="jdbc:log4jdbc:mysql://localhost:3306/travel?useSSL=false&amp;allowPublicKeyRetrieval=true"></property>
+		<property name="jdbcUrl" value="jdbc:log4jdbc:mysql://mysql98.cwwejub4lu96.ap-northeast-2.rds.amazonaws.com:3306/travel?useSSL=false&amp;allowPublicKeyRetrieval=true"></property>
 		<property name="username" value="travel"></property>
 		<property name="password" value="travel"></property>
 	</bean>

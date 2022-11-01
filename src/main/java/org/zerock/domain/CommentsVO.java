@@ -6,10 +6,9 @@ import lombok.Data;
 
 @Data
 public class CommentsVO {
-	private int cno;
-	private int bno;
-	private String commenter;
+	private Integer cno;
+	private Integer bno;
+	private String userid;
 	private String comment;
-	private int parent;
 	private Date comDate;
 }

@@ -16,12 +16,10 @@ public class Criteria {
 	private String type;	// 검색 유형
 	private String keyword;	// 키워드
 	
-	// 디폴트 생성자 -> 기본적으로 목록 보기 -> 1페이지를 보여준다.
 	public Criteria() {		
-		this(1, 12);	// default : 1페이지, 12개
+		this(1, 12);	//	default 1, 12
 	}
 	
-	// 몇 페이지를 보여줄지? 몇 개를 가져올지? 설정하는 생성자
 	public Criteria(int pageNum, int amount) {	// 보여줄 페이지에 대한 데이터
 		this.pageNum = pageNum;
 		this.amount = amount;

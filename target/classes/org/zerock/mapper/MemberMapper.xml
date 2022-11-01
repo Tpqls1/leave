@@ -3,6 +3,7 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http::/mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.zerock.mapper.MemberMapper">
+
 	<resultMap type="org.zerock.domain.MemberVO" id="memberMap">
 		<id property="userid" column="userid"></id>
 		<result property="pw" column="pw"></result>
@@ -19,20 +20,20 @@
 		<result property="grade" column="grade"></result>
 		<collection property="authList" resultMap="authMap"></collection>
 	</resultMap>
+	
 	<resultMap type="org.zerock.domain.AuthVO" id="authMap">
 		<result property="userid" column="userid"/>
 		<result property="auth" column="auth"/>
 	</resultMap>
-	
 <insert id="insert">
-	insert into member(userid, pw, username) values(#{userid},#{pw},#{username})
+	insert into tbl_member(userid, pw, username) values(#{userid},#{pw},#{username})
 </insert>	
 <select id="read" resultMap="memberMap">
 	select mem.userid, pw, username, enabled, regDate, auth
-	from member mem left outer join member_auth auth on mem.userid = auth.userid
+	from tbl_member mem left outer join member_auth auth on mem.userid = auth.userid
 	where mem.userid = #{userid}
 </select>
 <select id="idCheck" resultType="int">
-	select count(*) from member where userid = #{userid}
+	select count(*) from tbl_member where userid = #{userid}
 </select>
 </mapper>
