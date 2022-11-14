@@ -1,6 +1,8 @@
 package org.zerock.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +11,7 @@ import org.zerock.domain.BoardCatVO;
 import org.zerock.domain.BoardVO;
 import org.zerock.domain.Criteria;
 import org.zerock.domain.LikeVO;
+import org.zerock.domain.TagVO;
 import org.zerock.mapper.AttachMapper;
 import org.zerock.mapper.BoardCatMapper;
 import org.zerock.mapper.BoardMapper;
@@ -52,7 +55,7 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public List<AttachVO> getAttachList(Integer bno) {
 		log.info("getAttachList...");
-		return attachMapper.findByBno(bno);
+		return attachMapper.getAttachList(bno);
 	}
 
 	@Transactional
@@ -84,6 +87,7 @@ public class BoardServiceImpl implements BoardService {
 		tagMapper.deleteTag(bno);
 		commentsMapper.deleteByBno(bno);
 		catMapper.delete(bno);
+		attachMapper.deleteAll(bno);
 		return mapper.delete(bno) > 0;
 	}
 //	게시글 수정
@@ -91,9 +95,9 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public boolean update(BoardVO board) {
 		log.info("update..." + board);
-		attachMapper.deleteAll(board.getBno());
 		tagMapper.deleteTag(board.getBno());
 		catMapper.delete(board.getBno());
+		attachMapper.deleteAll(board.getBno());
 		
 		boolean updateResult = mapper.update(board) == 1;
 		if(updateResult && board.getAttachList() != null && board.getAttachList().size() > 0) {
@@ -102,6 +106,7 @@ public class BoardServiceImpl implements BoardService {
 				attachMapper.insert(attach);
 			}); 
 		}
+		
 		if(board.getTagList() != null && board.getTagList().size() > 0) {
 			board.getTagList().forEach(tag -> {
 				tag.setBno(board.getBno());
@@ -116,6 +121,7 @@ public class BoardServiceImpl implements BoardService {
 		}
 		return updateResult;
 	}
+	
 //	게시글 상세 
 	@Override
 	public BoardVO read(Integer bno) {
@@ -138,31 +144,25 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public List<BoardVO> getListWithPagingByCatNo(Criteria cri, Integer catno) {
-		log.info("getListWithPagingByCatno..." + cri + ", catno: " + catno);
+		log.info("getListWithPagingByCatno...cri: "+cri+" catno: "+catno);
 		return mapper.getListWithPagingByCatNo(cri, catno);
-	}
-
-//	댓글 수 
-	@Override
-	public void updateReplyCnt(Integer bno, int amount) {
-		log.info("updateReplyCnt...bno: "+ bno + ", amount: " + amount);
-		mapper.updateReplyCnt(bno, amount);
 	}
 
 //	좋아요(좋아요 버튼 클릭 -> 좋아요테이블 저장 게시글likeCnt 1증가
 //	해당 userid좋아요 있을 시 삭제, 게시글likeCnt 1감소) 
 	@Transactional
 	@Override
-	public void insertLike(LikeVO like) {
+	public int insertLike(LikeVO like) {
 		log.info("insertLike..." + like);
-		String userid = like.getUserid();
-		if(likeMapper.getUserid(userid) != null || likeMapper.getUserid(userid).size() > 0) {
-			likeMapper.deleteByBno(like.getBno());
-			mapper.decreaseLikeCnt();
+		Integer bno = like.getBno();
+		if(likeMapper.getLike(like) > 0) {
+			likeMapper.deleteLike(like);
+			mapper.decreaseLikeCnt(bno);
 		}else {
 			likeMapper.insertLike(like);
-			mapper.increaseLikeCnt();
+			mapper.increaseLikeCnt(bno);
 		}
+		return likeMapper.getLike(like);
 	}
 
 	//
@@ -172,8 +172,63 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public List<BoardCatVO> getCatByBno(BoardVO board) {
-		return catMapper.readByBno(board);
+	public List<BoardCatVO> getCatByBno(Integer bno) {
+		return catMapper.readByBno(bno);
+	}
+
+	@Override
+	public Integer getBnoByCatNo(Integer catno) {
+		return catMapper.getBnoByCatNo(catno);
+	}
+
+	@Override
+	public List<TagVO> getTagByBno(Integer bno) {
+		return tagMapper.readTagByBno(bno);
+	}
+
+	@Override
+	public List<BoardVO> getListByCatList(List<BoardCatVO> catList) {
+		Map<String, List<BoardCatVO>> categories = new HashMap<String, List<BoardCatVO>>();
+		categories.put("categories", catList);
+		return mapper.getListByCatList(categories);
+	}
+
+	@Override
+	public Integer getLikeCnt(Integer bno) {
+		return mapper.getLikeCount(bno);
+	}
+
+	@Override
+	public Integer getLike(LikeVO like) {
+		return likeMapper.getLike(like);
+	}
+
+	@Override
+	public List<BoardVO> getListByHashTag(String tagName) {
+		return mapper.getListByHashTag(tagName);
+	}
+
+	//	마이페이지 작성글
+	@Override
+	public List<BoardVO> readByUserid(String userid) {
+		return mapper.readByUserid(userid);	
+	}
+
+	//	마이페이지 좋아요누른 글
+	@Override
+	public List<LikeVO> getLikeByUserid(String userid) {
+		return likeMapper.getLikeByUserid(userid);
+	}
+	
+	//	작성한 게시글 수
+	@Override
+	public int getCountByUserid(String userid) {
+		return mapper.getCountByUserid(userid);
+	}
+
+	@Override
+	public int getTotal() {
+		return mapper.getTotal();
 	}
 	
 }

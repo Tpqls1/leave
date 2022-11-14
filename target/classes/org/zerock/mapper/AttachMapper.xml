@@ -5,31 +5,37 @@
 <mapper namespace="org.zerock.mapper.AttachMapper">
 	
 	<insert id="insert">
-		insert into attach (uuid, uploadPath, filename, bno, userid, attachType, thumbnail)
-		values(#{uuid}, #{uploadPath}, #{fileName}, #{bno}, #{userid}, #{attachType}, #{thumbnail})
+		insert into attach (uuid, uploadPath, filename, bno, userid, attachType, thumbnail, ano)
+		values(#{uuid}, #{uploadPath}, #{fileName}, #{bno}, #{userid}, #{attachType}, #{thumbnail}, #{ano})
 	</insert>
 	
 	<delete id="delete">
 		delete from attach where uuid = #{uuid}
 	</delete>
 	
+	<!-- 게시글 첨부파일(전체) -->
+	<select id="getAttachList" resultType="org.zerock.domain.AttachVO">
+		select * from attach where bno = #{bno} order by ano;
+	</select>
+	
 	<!-- 게시글 첨부파일 -->
 	<select id="findByBno" resultType="org.zerock.domain.AttachVO">
-		select * from attach where bno = #{bno}
+		select * from attach where thumbnail = 0 and bno = #{bno} order by ano;
 	</select>
 	
 	<!-- 게시글별 썸네일 -->
-	<select id="thumbnailByBno" resultType="org.zerock.domain.AttachVO">
-		select * from attach where bno = #{bno} and thumbnail = 1 order by bno desc;
+	<select id="getThumbnailByBno" resultType="org.zerock.domain.AttachVO">
+		select * from attach where thumbnail = 1 and bno = #{bno} order by bno desc;
 	</select>
 
 	<select id="getThumbnail" resultType="org.zerock.domain.AttachVO">
 		select * from attach where thumbnail = 1 order by bno desc;
 	</select>
 
+
 	<!-- 프로필사진 -->
 	<select id="findByUserid" resultType="org.zerock.domain.AttachVO">
-		select * from attach where userid = #{userid} order by bno desc;
+		select * from attach where userid = #{userid} and attachType=1 order by bno desc;
 	</select>
 	
 	<!-- 게시글첨부파일 삭제 -->

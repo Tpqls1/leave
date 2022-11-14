@@ -12,7 +12,7 @@ public interface CommentsMapper {
 	public CommentsVO read(Integer cno);
 	public List<CommentsVO> getList(Integer bno);
 	public int getCountByBno(Integer bno);
-	public int update(String comment, Integer cno);
+	public int update(CommentsVO comments);
 //	작성한 게시글 불러오기
 	public List<Integer> getBnoByUserid(String userid);
 }

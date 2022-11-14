@@ -9,7 +9,7 @@
 </select>
 
 <select id="readTagByBno" resultType="org.zerock.domain.TagVO">
-	select * from tag where bno = #{bno} order by tagName acs
+	select * from tag where bno = #{bno} order by tagno 
 </select>
 
 <insert id="insertTag">
@@ -19,10 +19,5 @@
 <delete id="deleteTag">
 	delete from tag where bno = #{bno}
 </delete>
-
-<!-- 배열로 받아서 반복실행 -->
-<update id="updateTag">
-	update tag set bno=#{bno}, tagName=#{tagName} where bno=#{bno}
-</update>
 
 </mapper>

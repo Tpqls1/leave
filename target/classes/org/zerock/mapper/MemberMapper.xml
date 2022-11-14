@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-	"http::/mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.zerock.mapper.MemberMapper">
-
 	<resultMap type="org.zerock.domain.MemberVO" id="memberMap">
 		<id property="userid" column="userid"></id>
 		<result property="pw" column="pw"></result>
 		<result property="username" column="username"></result>
 		<result property="nickname" column="nickname"></result>
-		<result property="eamil" column="email"></result>
+		<result property="email" column="email"></result>
 		<result property="phone" column="phone"></result>
 		<result property="addr" column="addr"></result>
 		<result property="detAddr" column="detAddr"></result>
@@ -17,23 +15,109 @@
 		<result property="birth_date" column="birth_date"></result>
 		<result property="gender" column="gender"></result>
 		<result property="regDate" column="regDate"></result>
-		<result property="grade" column="grade"></result>
 		<collection property="authList" resultMap="authMap"></collection>
 	</resultMap>
-	
+
 	<resultMap type="org.zerock.domain.AuthVO" id="authMap">
-		<result property="userid" column="userid"/>
-		<result property="auth" column="auth"/>
+		<result property="userid" column="userid" />
+		<result property="auth" column="auth" />
 	</resultMap>
-<insert id="insert">
-	insert into tbl_member(userid, pw, username) values(#{userid},#{pw},#{username})
-</insert>	
-<select id="read" resultMap="memberMap">
-	select mem.userid, pw, username, enabled, regDate, auth
-	from tbl_member mem left outer join member_auth auth on mem.userid = auth.userid
-	where mem.userid = #{userid}
-</select>
-<select id="idCheck" resultType="int">
-	select count(*) from tbl_member where userid = #{userid}
-</select>
+
+	<sql id="criteria">
+		<trim prefix=" where (" suffix=") " prefixOverrides="OR">
+			<foreach item='type' collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'N'.toString()">
+							username like CONCAT('%', #{keyword}, '%')
+						</when>
+						<when test="type == 'U'.toString()">
+							userid like CONCAT('%', #{keyword}, '%')
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	</sql>
+
+	<select id="getTotalCount" resultType="integer">
+<![CDATA[
+	select count(*) from tbl_member
+]]>
+		<include refid="criteria"></include>
+	</select>
+
+	<select id="getListWithPaging"
+		resultType="org.zerock.domain.MemberVO">
+<![CDATA[
+    select * from tbl_member
+]]>
+		<include refid="criteria"></include>
+		limit #{pageStart}, #{amount}
+	</select>
+
+
+
+	<select id="getList" resultType="org.zerock.domain.MemberVO">
+<![CDATA[
+select * from tbl_member and order by userid desc
+]]>
+	</select>
+
+
+	<!-- 회원 가입 -->
+	<insert id="insert">
+		insert into tbl_member (userid, pw, username,
+		nickname, email, phone, addr, detAddr, postCode, birth_date, gender)
+		values
+		(#{userid}, #{pw}, #{username}, #{nickname}, #{email}, #{phone},
+		#{addr}, #{detAddr}, #{postCode}, #{birth_date}, #{gender})
+	</insert>
+
+	<!-- 회원정보 수정 -->
+	<update id="update">
+		update tbl_member set
+		pw =
+		#{pw},
+		username =
+		#{username},
+		nickname = #{nickname},
+		email = #{email},
+		phone = #{phone},
+		addr =
+		#{addr},
+		detAddr = #{detAddr},
+		postCode =
+		#{postCode},
+		birth_date =
+		#{birth_date},
+		gender = #{gender}
+		WHERE USERID =
+		#{userid}
+	</update>
+
+
+
+	<select id="read" resultMap="memberMap">
+		select mem.userid, pw, username,
+		nickname, enabled, addr, Detaddr, birth_date, phone, regDate, gender,
+		postCode, email, auth
+		from tbl_member mem left outer join
+		member_auth
+		auth on mem.userid =
+		auth.userid
+		where mem.userid = #{userid}
+	</select>
+
+
+	<delete id="delete">
+		delete from tbl_member where userid = #{userid}
+	</delete>
+
+
+
+	<select id="idCheck" resultType="int">
+		select count(*) from member
+		where userid = #{userid}
+	</select>
 </mapper>

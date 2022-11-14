@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://www.springframework.org/security/tags"
+	prefix="sec"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="s"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,7 +70,7 @@
 
           <div class="form-main">
             <div class="post-title">
-              추천 카테고리<span class="icon">*</span><h4 class="regist-info">최대 3개까지 선택</h4>
+              카테고리<span class="icon">*</span><h4 class="regist-info">최대 3개까지 선택</h4>
             </div>
             <div class="main-title category-list">
                <span class="category-item" id="category-item1"><input type="hidden" value="1">#국내여행</span>
@@ -79,8 +84,8 @@
           <div class="form-main">
             <div class="post-title">
               해시태그(최대5개)<br>
-              <button type="button" class="btnRemove">#태그삭제</button>&nbsp;
-           	  <button type="button" class="btnAdd">#태그추가</button>
+              <button type="button" class="btnRemove btn btn_type5">#태그삭제</button>&nbsp;
+           	  <button type="button" class="btnAdd btn btn_type5">#태그추가</button>
             </div>
             <div class="main-title hashtag-list">
             </div>
@@ -88,6 +93,13 @@
           <div class="post-btn-form"> 
             <input class="btn btn_type3 pa-lf-100" type="submit" value="확인">
           </div>	
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+		  <sec:authentication property="principal" var="pinfo"/>
+		  <input type="hidden" name="userid" value="${pinfo.username}">
+		  <c:set var="nickname">
+		  	<sec:authentication property="principal.member.nickname" />
+		  </c:set>
+		  <input type="hidden" name="nickname" value="${nickname}">
           </form>
         </div>
       </div>
@@ -105,14 +117,17 @@ $(document).ready(function(){
 		var	str = "<input type='hidden' name='attachList[0].thumbnail' value='true'>";
 		$(".uploadResult ul li").each(function(i, obj){
 			var jobj = $(obj);
+			var j;
+			j = i+1;
 			console.dir("jobj= " + jobj);
 		    console.log("-------------------------");
 		    console.log('filename= ' + jobj.data("filename"));
 			str += "<input type='hidden' name='attachList["+i+"].fileName' value='"+jobj.data("filename")+"'>'";
 			str += "<input type='hidden' name='attachList["+i+"].uuid' value='"+jobj.data("uuid")+"'>'";
 			str += "<input type='hidden' name='attachList["+i+"].uploadPath' value='"+jobj.data("path")+"'>'";
+			str += "<input type='hidden' name='attachList["+i+"].ano' value='"+ j +"'>'";
 		});
-		console.log('str= ' + str);
+		console.log(str);
 		formObj.append(str).submit();
 	});
 	
@@ -131,8 +146,8 @@ $(document).ready(function(){
 		return true;
 	}
 	
-//	var csrfHeaderName = "${_csrf.headerName}";
-//	var csrfTokenValue = "${_csrf.token}";
+	var csrfHeaderName = "${_csrf.headerName}";
+	var csrfTokenValue = "${_csrf.token}";
 	
 	$("input[type='file']").on("change", function(e){
 		var formData = new FormData();
@@ -151,9 +166,9 @@ $(document).ready(function(){
 			url: '/uploadFileAjax',
 			processData: false,
 			contentType: false,
-//			beforeSend: function(xhr){
-//				xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
-//			},
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+			},
 			data:formData,
 			type: 'POST',
 			dataType: 'json',	// JSON 객체 형태로 응답을 받겠다.
@@ -177,7 +192,7 @@ $(document).ready(function(){
 			    str += " data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.image+"'";
 			    str += "><div>";
 			    str += "<button type='button' data-file='" + fileCallPath + "' data-type='image' " +
-			    	"class='btn btn_type2'></button><br>";
+			    	"class='btn btn_type1' style='background-color: #ee3e61;'>X</button><br>";
 			    str += "<img src='/display?fileName="+fileCallPath+"'>";
 			    str += "</div>";
 			    str +"</li>";
@@ -190,13 +205,13 @@ $(document).ready(function(){
 		console.log("delete file");
 		var targetFile = $(this).data("file");
 		var targetLi = $(this).closest("li");
-		var attachType = '0'
+		var attachType = false;
 		$.ajax({
 			url: '/deleteFile',
 			data: {fileName: targetFile, type: attachType},
-//			beforeSend: function(xhr){
-//				xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
-//			},
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+			},
 			dataType:'text',
 			type: 'POST',
 			success: function(result){

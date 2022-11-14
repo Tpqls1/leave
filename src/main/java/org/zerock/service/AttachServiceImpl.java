@@ -3,10 +3,10 @@ package org.zerock.service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.domain.AttachVO;
 import org.zerock.domain.BoardVO;
 import org.zerock.mapper.AttachMapper;
@@ -36,6 +36,11 @@ public class AttachServiceImpl implements AttachService {
 	}
 	
 	@Override
+	public void insertProfile(AttachVO attach) {
+		attachMapper.insert(attach);
+		log.info("profileAttach: "+ attach);
+	}
+		@Override
 	public void deleteFiles(List<AttachVO> attachList) {
 		if(attachList == null || attachList.size() == 0) {
 		      return;
@@ -44,17 +49,10 @@ public class AttachServiceImpl implements AttachService {
 		log.info(attachList);
 		attachList.forEach(attach -> {
 		try {
-			if(attach.isAttachType()) {	//	회원 프로필 
-				Path file  = Paths.get("/Users/tpqls/upload/member/"+attach.getUploadPath()+"/" + attach.getUuid()+"_"+ attach.getFileName());
+				Path file  = Paths.get("/Users/tpqls/upload/"+attach.getUploadPath()+"/" + attach.getUuid()+"_"+ attach.getFileName());
 		        Files.deleteIfExists(file);
-		        Path thumbNail = Paths.get("/Users/tpqls/upload/member/"+attach.getUploadPath()+"/s_" + attach.getUuid()+"_"+ attach.getFileName());
+		        Path thumbNail = Paths.get("/Users/tpqls/upload/"+attach.getUploadPath()+"/s_" + attach.getUuid()+"_"+ attach.getFileName());
 		        Files.delete(thumbNail);
-			}else {				//	게시글 첨부파일
-				Path file  = Paths.get("/Users/tpqls/upload/board/"+attach.getUploadPath()+"/" + attach.getUuid()+"_"+ attach.getFileName());
-		        Files.deleteIfExists(file);
-		        Path thumbNail = Paths.get("/Users/tpqls/upload/board/"+attach.getUploadPath()+"/s_" + attach.getUuid()+"_"+ attach.getFileName());
-		        Files.delete(thumbNail);
-			}
 	      }catch(Exception e) {
 	        log.error("delete file error" + e.getMessage());
 	      }//end catch
@@ -64,5 +62,25 @@ public class AttachServiceImpl implements AttachService {
 	@Override
 	public List<AttachVO> getThumbnail() {
 		return attachMapper.getThumbnail();
+	}
+
+	@Override
+	public AttachVO getThumbnailByBno(Integer bno) {
+		return attachMapper.getThumbnailByBno(bno);
+	}
+
+	@Override
+	public List<AttachVO> findByBno(Integer bno) {
+		return attachMapper.findByBno(bno);
+	}
+
+	@Override
+	public AttachVO findByUserid(String userid) {
+		return attachMapper.findByUserid(userid);
+	}
+
+	@Override
+	public void deleteByUserid(String userid) {
+		attachMapper.deleteByUserid(userid);
 	}
 }

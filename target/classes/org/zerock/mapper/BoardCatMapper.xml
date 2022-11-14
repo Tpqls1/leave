@@ -6,6 +6,11 @@
 <select id="readByBno" resultType="org.zerock.domain.BoardCatVO">
 	select * from board_cat where bno = #{bno}
 </select>	
+<!-- 카테고리별 게시글목록 -->
+<select id="getBnoByCatNo" resultType="org.zerock.domain.BoardCatVO">
+	select bno from board_cat where catno = #{catno} order by bno desc
+</select>	
+
 <!-- 등록 -->	
 <insert id="insert">
 	insert into board_cat(bno, catno) 

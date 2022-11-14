@@ -1,6 +1,7 @@
 package org.zerock.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -19,4 +20,13 @@ public class MemberVO {
 	private String gender;
 	private Date regDate;		//	회원가입일 <- 정렬기준
 	private boolean enabled;
+	private List<AuthVO> authList;	// 권한
+	
+	public String getLowerEmail() {
+		return email.split("@")[0];
+	}
+	
+	public String getHigherEmail() {
+		return email.split("@")[1];
+	}
 }

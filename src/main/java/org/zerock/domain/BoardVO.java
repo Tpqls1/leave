@@ -14,6 +14,7 @@ public class BoardVO {
 	private Date regDate;	
 	private int likeCnt;	//	좋아요 수
 	private int comCnt;		//	댓글 수 
+	private String nickname;
 
 	// 첨부파일 목록을 추가
 	private List<AttachVO> attachList;

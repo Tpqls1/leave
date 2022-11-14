@@ -13,18 +13,17 @@
 
 <!-- 댓글 등록 -->
 <insert id="insert">
-insert into comments (bno, comment, userid)
-	values (#{bno}, #{comment}, #{userid})
+insert into comments (bno, comment, userid, nickname)
+	values (#{bno}, #{comment}, #{userid}, #{nickname})
 </insert>
 
-<!-- 게시글 상세 -->
 <select id="read" resultType="org.zerock.domain.CommentsVO">
 select * from comments where cno = #{cno}
 </select>
 
 <!-- 댓글 작성한 게시글 가져오기 -->
 <select id="getBnoByUserid" resultType="Integer">
-select bno from comments where userid = #{userid}
+select bno from comments where userid = #{userid} order by bno desc
 </select>
 
 <delete id="delete">
@@ -40,7 +39,7 @@ update comments set comment = #{comment} where cno = #{cno}
 </update>
 
 <select id="getList" resultType="org.zerock.domain.CommentsVO">
-select * from comments where bno = #{bno} order by cno asc
+select * from comments where bno = #{bno} order by cno 
 </select>
 
 <select id="getCountByBno" resultType="int">

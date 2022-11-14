@@ -11,4 +11,5 @@ public class AttachVO {
 	private String userid;
 	private boolean attachType;
 	private boolean thumbnail;
+	private Integer ano;
 }

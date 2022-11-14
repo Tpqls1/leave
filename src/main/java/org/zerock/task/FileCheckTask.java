@@ -44,7 +44,7 @@ public class FileCheckTask {
 	//	전날에 있는 데이터에 대하여 작업한다.
 	//	데이터베이스에 존재하지 않지만 파일로 존재하는 파일을 삭제 : 기준 -> 데이터베이스 
 	//	데이터베이스에 존재하는 파일은 유지를 하고 존재하지 않으면 삭제 
-	@Scheduled(cron = "0 45 14 * * *") // 오전 11시 50분 
+	@Scheduled(cron = "0 00 13 * * *") // 초 분 시 일 월 년 
 	public void checkFiles() {
 		log.warn("File check task run.........");
 		log.warn(new Date());
@@ -57,7 +57,7 @@ public class FileCheckTask {
 				.collect(Collectors.toList()); // 파일에 대한 목록(존재하는) - 원본파일
 
 		// image file has thumbnail file
-		fileList.stream().filter(vo -> vo.isAttachType() == true).map(
+		fileList.stream().map(
 				vo -> Paths.get(UPLOAD_PATH, vo.getUploadPath(), "s_" + vo.getUuid() + "_" + vo.getFileName())) // 섬네일
 				.forEach(p -> fileListPaths.add(p));
 		log.warn("=======================================");
