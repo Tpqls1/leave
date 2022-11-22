@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.BoardCatMapper">
+<!--  -->
+<select id="readByBno" resultType="org.zerock.domain.BoardCatVO">
+	select * from board_cat where bno = #{bno}
+</select>	
+<!-- 카테고리별 게시글목록 -->
+<select id="getBnoByCatNo" resultType="org.zerock.domain.BoardCatVO">
+	select bno from board_cat where catno = #{catno} order by bno desc
+</select>	
+
+<!-- 등록 -->	
+<insert id="insert">
+	insert into board_cat(bno, catno) 
+	values(#{bno}, #{catno})
+</insert>
+
+<!-- 삭제 -->
+<delete id="delete">
+	delete from board_cat where bno = #{bno}
+</delete>
+
+<update id="updateByBno">
+	update board_cat set bno=#{bno} catno=#{catno} where bno=#{bno}
+</update>
+
+</mapper>
